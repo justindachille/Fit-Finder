@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Listings</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $.post('/initialize_database', function() {
+                console.log('Database initialized');
+            });
+
+            updateJobListings();
+            updateRunningJobs();
+
+            setInterval(updateRunningJobs, 5000);
+
+            $('#run-filters').click(function() {
+                $.post('/run_filters', function() {
+                    updateJobListings();
+                });
+            });
+
+            $('#scrape-jobs').click(function() {
+                var numJobs = $('#num-jobs').val();
+                $.post('/scrape_jobs', { num_jobs: numJobs }, function() {
+                    updateJobListings();
+                });
+            });
+            displayLatestJobListing();
+        });
+
+        function updateJobListings() {
+            $.getJSON('/job_listing_stats', function(data) {
+                $('#total-count').text(data.total_count);
+                $('#unchecked-count').text(data.unchecked_count);
+                $('#ready-count').text(data.ready_count);
+            });
+        }
+
+        function updateRunningJobs() {
+            $.getJSON('/running_jobs', function(data) {
+                var runningJobsList = $('#running-jobs');
+                runningJobsList.empty();
+
+                data.forEach(function(job) {
+                    var listItem = $('<li>').text(job.title);
+                    runningJobsList.append(listItem);
+                });
+            });
+        }
+
+        function displayLatestJobListing() {
+            $.getJSON('/latest_job_listing', function(job) {
+                var container = $('#job-details');
+                container.empty();
+
+                if (job) {
+                    var jobDetails = $('<div>').text('Title: ' + job.title);
+                    container.append(jobDetails);
+
+                    $('#copy-link').off('click').on('click', function() {
+                        copyToClipboard(job.link);
+                    });
+
+                    $('#mark-inactive').off('click').on('click', function() {
+                        markJobListingInactive(job.id);
+                    });
+                } else {
+                    container.text('No suitable job listings available.');
+                    $('#copy-link').prop('disabled', true);
+                    $('#mark-inactive').prop('disabled', true);
+                }
+            });
+        }
+
+        function markJobListingInactive(jobId) {
+            $.ajax({
+                url: '/mark_job_listing_inactive',
+                type: 'POST',
+                data: JSON.stringify({ job_id: jobId }),
+                contentType: 'application/json',
+                success: function(response) {
+                    displayLatestJobListing();
+                    updateJobListings();
+                }
+            });
+        }        
+
+        function updateJobStats(jobListings) {
+            var totalCount = jobListings.length;
+            var uncheckedCount = jobListings.filter(function(job) {
+                return !job.sponsorship_checked || !job.candidate_fit_checked;
+            }).length;
+            var readyCount = totalCount - uncheckedCount;
+
+            $('#total-count').text(totalCount);
+            $('#unchecked-count').text(uncheckedCount);
+            $('#ready-count').text(readyCount);
+        }
+
+        function copyToClipboard(text) {
+            var tempInput = $('<input>');
+            $('body').append(tempInput);
+            tempInput.val(text).select();
+            document.execCommand('copy');
+            tempInput.remove();
+        }
+
+        function removeJobListing(jobId) {
+            $.ajax({
+                url: '/remove_job_listing',
+                type: 'POST',
+                data: JSON.stringify({ job_id: jobId }),
+                contentType: 'application/json',
+                success: function(response) {
+                    updateJobListings();
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <h2>Job Listing Stats</h2>
+            <p>Total Count: <span id="total-count">0</span></p>
+            <p>Unchecked Count: <span id="unchecked-count">0</span></p>
+            <p>Ready Count: <span id="ready-count">0</span></p>
+        </div>
+        <div class="section">
+            <h2>Run Filters</h2>
+            <button id="run-filters">Run Filters</button>
+        </div>
+        <div class="section">
+            <h2>Scrape New Jobs</h2>
+            <label for="num-jobs">Number of Jobs:</label>
+            <input type="range" id="num-jobs" min="1" max="100" value="10">
+            <button id="scrape-jobs">Scrape Jobs</button>
+        </div>
+        <div class="section">
+            <h2>Latest Job Listing</h2>
+            <div id="latest-job-listing">
+                <div id="job-details"></div>
+                <button id="copy-link">Copy Link</button>
+                <button id="mark-inactive">Mark as Inactive</button>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Currently Running Jobs</h2>
+            <ul id="running-jobs"></ul>
+        </div>
+    </div>
+</body>
+</html>
