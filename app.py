@@ -58,12 +58,9 @@ def get_running_jobs():
 def scrape_jobs_route():
     num_jobs = int(request.form['num_jobs'])
     print(f'Attempting to scrape {num_jobs} jobs')
-    last_run_time = get_last_run_time()
     job_scraper = IndeedJobScraper()
-    job_listings = job_scraper.scrape_job_listings(last_run_time, num_jobs=num_jobs)
+    job_listings = job_scraper.scrape_job_listings(num_jobs=num_jobs)
     save_job_listings(job_listings)
-    if job_listings:
-        update_last_run_time(job_listings[-1]['published'])
     return jsonify({"message": "Jobs scraped successfully"})
 
 if __name__ == '__main__':

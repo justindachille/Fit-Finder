@@ -17,7 +17,7 @@ def initialize_database():
     c = conn.cursor()
 
     c.execute('''CREATE TABLE IF NOT EXISTS job_listings
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 (id TEXT PRIMARY KEY,
                  title TEXT,
                  company TEXT,
                  location TEXT,
@@ -45,9 +45,9 @@ def save_job_listings(job_listings):
 
     for job in job_listings:
         c.execute("""
-            INSERT INTO job_listings (title, company, location, published, salary, summary, link, description, sponsorship_checked, candidate_fit_checked, inactive, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (job['title'], job['company'], job['location'], job['published'], job['salary'], job['summary'], job['link'], job['description'], job['sponsorship_checked'], job['candidate_fit_checked'], 0, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            INSERT OR IGNORE INTO job_listings (id, title, company, location, published, salary, summary, link, description, sponsorship_checked, candidate_fit_checked, inactive, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (job['id'], job['title'], job['company'], job['location'], job['published'], job['salary'], job['summary'], job['link'], job['description'], job['sponsorship_checked'], job['candidate_fit_checked'], 0, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
     conn.commit()
     conn.close()
