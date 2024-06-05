@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
 from database import load_job_listings, mark_job_listing_inactive, get_job_listing_stats, save_job_listings, get_last_run_time, update_last_run_time, initialize_database
-from filter_jobs import filter_jobs, running_jobs
+from filter_jobs import filter_jobs
 from scraper import IndeedJobScraper
 
 app = Flask(__name__)
@@ -49,10 +49,6 @@ def remove_job_listing_route():
 def run_filters_route():
     filter_jobs()
     return jsonify({"message": "Filters run successfully"})
-
-@app.route('/running_jobs')
-def get_running_jobs():
-    return jsonify([{'title': job} for job in running_jobs])
 
 @app.route('/scrape_jobs', methods=['POST'])
 def scrape_jobs_route():

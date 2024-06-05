@@ -20,10 +20,7 @@
                 console.log('Database initialized');
                 // Call the other functions after database initialization
                 updateJobListings();
-                updateRunningJobs();
                 displayLatestJobListing();
-
-                setInterval(updateRunningJobs, 5000);
 
                 $('#run-filters').click(function() {
                     $.post('/run_filters', function() {
@@ -45,18 +42,6 @@
                 $('#total-count').text(data.total_count);
                 $('#unchecked-count').text(data.unchecked_count);
                 $('#ready-count').text(data.ready_count);
-            });
-        }
-
-        function updateRunningJobs() {
-            $.getJSON('/running_jobs', function(data) {
-                var runningJobsList = $('#running-jobs');
-                runningJobsList.empty();
-
-                data.forEach(function(job) {
-                    var listItem = $('<li>').text(job.title);
-                    runningJobsList.append(listItem);
-                });
             });
         }
 
@@ -149,7 +134,7 @@
         <div class="section">
             <h2>Scrape New Jobs</h2>
             <label for="num-jobs">Number of Jobs:</label>
-            <input type="range" id="num-jobs" min="1" max="500" value="20">
+            <input type="range" id="num-jobs" min="1" max="5000" value="20">
             <button id="scrape-jobs">Scrape Jobs</button>
         </div>
         <div class="section">
@@ -159,10 +144,6 @@
                 <button id="copy-link">Copy Link</button>
                 <button id="mark-inactive">Mark as Inactive</button>
             </div>
-        </div>
-        <div class="section">
-            <h2>Currently Running Jobs</h2>
-            <ul id="running-jobs"></ul>
         </div>
     </div>
 </body>

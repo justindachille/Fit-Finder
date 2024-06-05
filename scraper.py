@@ -9,7 +9,7 @@ import feedparser
 from database import save_job_listings, get_job_listing_stats, load_job_listings
 
 class IndeedJobScraper:
-    def scrape_job_listings(self, num_jobs):
+    def scrape_job_listings(self, num_jobs, max_retries=3):
         base_urls = [
             "https://uk.indeed.com/rss?q=computer+science&l=London%2C+Greater+London&sort=date",
             "https://uk.indeed.com/rss?q=software+engineer&l=London%2C+Greater+London&sort=date",
@@ -57,25 +57,32 @@ class IndeedJobScraper:
                     # Scrape the job description
                     print('Link:', job['link'])
                     print(f'job id: {job_id}')
-                    with SB() as sb:
+                    retries = 0
+                    while retries < max_retries:
                         try:
-                            sb.open(job['link'])
-                            job_description_div = WebDriverWait(sb.driver, 10).until(
-                                EC.presence_of_element_located((
-                                    By.CSS_SELECTOR,
-                                    '#jobDescriptionText, .jobsearch-jobDescriptionText, .jobDescription, .jobsearch-JobComponent-description'
-                                ))
-                            )
-                            job['description'] = job_description_div.text
+                            with SB() as sb:
+                                sb.open(job['link'])
+                                job_description_div = WebDriverWait(sb.driver, 10).until(
+                                    EC.presence_of_element_located((
+                                        By.CSS_SELECTOR,
+                                        '#jobDescriptionText, .jobsearch-jobDescriptionText, .jobDescription, .jobsearch-JobComponent-description'
+                                    ))
+                                )
+                                job['description'] = job_description_div.text
+                            break
                         except Exception as e:
-                            print("Job description not found.", e)
-                            continue  # Skip job listings without a description
+                            print(f"Error occurred while scraping job description. Retrying... (Attempt {retries + 1}/{max_retries})")
+                            retries += 1
+                            if retries == max_retries:
+                                print("Max retries reached. Skipping job listing.")
+                                continue  # Skip job listings that consistently fail
                     job_listings.append(job)
                     save_job_listings([job])  # Save each job listing individually
                     if get_job_listing_stats()['total_count'] >= num_jobs:
                         print(f'Found enough jobs:', get_job_listing_stats()['total_count'])
                         return job_listings
                     sleep(uniform(1, 1.5))
+                sleep(uniform(1, 1.5))
             start += 20
             sleep(uniform(1, 5))
         return job_listings
