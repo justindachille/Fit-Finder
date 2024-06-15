@@ -1,15 +1,14 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-torch.random.manual_seed(0)
 
 def load_model():
-    torch.random.manual_seed(0)
+    model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer.pad_token_id = tokenizer.eos_token_id
     model = AutoModelForCausalLM.from_pretrained(
-        "microsoft/Phi-3-mini-128k-instruct",
-        device_map="cuda",
-        torch_dtype="auto",
-        trust_remote_code=True,
+        model_id,
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
         cache_dir="./llm_cache/",
     )
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-128k-instruct")
     return model, tokenizer
