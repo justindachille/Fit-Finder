@@ -59,27 +59,23 @@ class IndeedJobScraper:
                     print(f'job id: {job_id}')
                     retries = 0
                     while retries < max_retries:
-                        sb = None
                         try:
-                            sb = SB()
-                            sb.open(job['link'])
-                            job_description_div = WebDriverWait(sb.driver, 10).until(
-                                EC.presence_of_element_located((
-                                    By.CSS_SELECTOR,
-                                    '#jobDescriptionText, .jobsearch-jobDescriptionText, .jobDescription, .jobsearch-JobComponent-description'
-                                ))
-                            )
-                            job['description'] = job_description_div.text
-                            break
+                            with SB() as sb:
+                                sb.open(job['link'])
+                                job_description_div = WebDriverWait(sb.driver, 10).until(
+                                    EC.presence_of_element_located((
+                                        By.CSS_SELECTOR,
+                                        '#jobDescriptionText, .jobsearch-jobDescriptionText, .jobDescription, .jobsearch-JobComponent-description'
+                                    ))
+                                )
+                                job['description'] = job_description_div.text
+                                break
                         except Exception as e:
                             print(f"Error occurred while scraping job description. Retrying... (Attempt {retries + 1}/{max_retries})")
                             retries += 1
                             if retries == max_retries:
                                 print("Max retries reached. Skipping job listing.")
-                                continue  # Skip job listings that consistently fail
-                        finally:
-                            if sb is not None:
-                                sb.quit()
+                                job['description'] = None  # Set job description to None if scraping fails
                     job_listings.append(job)
                     save_job_listings([job])
                     if get_job_listing_stats()['total_count'] >= num_jobs:
