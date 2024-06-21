@@ -25,12 +25,16 @@ class IndeedJobScraper:
         start = 0
         job_listings = []
         print('count:', get_job_listing_stats()['total_count'], 'num jobs', num_jobs)
+        zero_entry_count = 0
         while get_job_listing_stats()['total_count'] < num_jobs:
             print('Current jobs:', get_job_listing_stats()['total_count'], f'Scraping until {num_jobs} jobs')
+            all_zero_entries = True
             for base_url in base_urls:
                 url = base_url + f"&start={start}"
                 feed = feedparser.parse(url)
                 print(f'Number of entries: {len(feed.entries)}')
+                if len(feed.entries) > 0:
+                    all_zero_entries = False
                 for i, entry in enumerate(feed.entries):
                     print(f'Scraping job: {i+1} of {len(feed.entries)}')
                     job_link = entry.link
@@ -83,6 +87,13 @@ class IndeedJobScraper:
                         return job_listings
                     sleep(uniform(1, 1.5))
                 sleep(uniform(1, 1.5))
+            if all_zero_entries:
+                zero_entry_count += 1
+                if zero_entry_count == 3:
+                    print("Detected 0 entries for all links 3 times in a row. Stopping the scraper.")
+                    return job_listings
+            else:
+                zero_entry_count = 0
             start += 20
             sleep(uniform(1, 5))
         return job_listings
