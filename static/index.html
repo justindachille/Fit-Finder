@@ -54,8 +54,10 @@
                     var jobDetails = $('<div>').text('Title: ' + job.title);
                     container.append(jobDetails);
 
-                    $('#copy-link').off('click').on('click', function() {
-                        copyToClipboard(job.link);
+                    $('#open-job').off('click').on('click', function() {
+                        if (job.link) {
+                            window.open(job.link, '_blank');
+                        }
                     });
 
                     $('#mark-inactive').off('click').on('click', function() {
@@ -65,7 +67,7 @@
                     });
                 } else {
                     container.text('No suitable job listings available.');
-                    $('#copy-link').prop('disabled', true);
+                    $('#open-job').prop('disabled', true);
                     $('#mark-inactive').prop('disabled', true);
                 }
             });
@@ -96,14 +98,6 @@
             $('#total-count').text(totalCount);
             $('#unchecked-count').text(uncheckedCount);
             $('#ready-count').text(readyCount);
-        }
-
-        function copyToClipboard(text) {
-            var tempInput = $('<input>');
-            $('body').append(tempInput);
-            tempInput.val(text).select();
-            document.execCommand('copy');
-            tempInput.remove();
         }
 
         function removeJobListing(jobId) {
@@ -141,7 +135,7 @@
             <h2>Latest Job Listing</h2>
             <div id="latest-job-listing">
                 <div id="job-details"></div>
-                <button id="copy-link">Copy Link</button>
+                <button id="open-job">Open Job</button>
                 <button id="mark-inactive">Mark as Inactive</button>
             </div>
         </div>
