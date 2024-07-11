@@ -9,6 +9,10 @@ llm_cache/
 # C extensions
 *.so
 
+/proxies/
+/proxies/megaproxylist.csv
+
+/latest_logs/
 # Distribution / packaging
 .Python
 build/
