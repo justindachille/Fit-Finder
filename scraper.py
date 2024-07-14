@@ -8,6 +8,7 @@ from datetime import datetime
 from time import sleep
 from random import uniform
 from database import save_job_listings, get_job_listing_stats, load_job_listings
+from utils import stacked_random_wait
 
 # Global flag to control proxy usage
 USE_PROXY = False
@@ -175,6 +176,6 @@ class IndeedJobScraper:
             else:
                 zero_entry_count = 0
             
-            sleep(uniform(1, 5))
+            stacked_random_wait()
         
         return job_listings

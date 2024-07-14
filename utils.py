@@ -1,3 +1,5 @@
+import random
+from time import sleep
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -12,3 +14,15 @@ def load_model():
         cache_dir="./llm_cache/",
     )
     return model, tokenizer
+
+def stacked_random_wait():
+    if random.random() > 0.8:
+        sleep(random.uniform(10, 20))
+    elif random.random() > 0.6:
+        sleep(random.uniform(5, 10))
+    elif random.random() > 0.4:
+        sleep(random.uniform(2, 5))
+    elif random.random() > 0.2:
+        sleep(random.uniform(1, 2))
+    else:
+        sleep(random.uniform(0, 1))

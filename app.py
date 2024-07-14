@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_from_directory
 from database import load_job_listings, mark_job_listing_inactive, get_job_listing_stats, save_job_listings, get_last_run_time, update_last_run_time, initialize_database
-# from filter_jobs import filter_jobs
+from filter_jobs import filter_jobs
 from scraper import IndeedJobScraper
 
 app = Flask(__name__)
