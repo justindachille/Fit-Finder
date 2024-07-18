@@ -37,11 +37,11 @@ def filter_jobs():
         if not job['sponsorship_checked']:
             print('Checking sponsorship for job:', job['title'])
             prompt = f"Job Title: {job['title']}\nCompany: {job['company']}\nLocation: \
-                {job['location']}\nDescription: {job['description']}\n\nDoes this job offer sponsorship? \
-                    Answer in one word: YES if the listing says the job offers sponsorship. \
-                    Answer NO if the job explicitly \
-                    states that sponsorship is not offered or they are only hiring candidates who are already \
-                    legally allowed to work in the country. Remember to answer in one word: yes or no."
+                {job['location']}\nDescription: {job['description']}\n\nDoes this job offer UK work visa sponsorship? \
+                Answer YES only if the listing specifically mentions offering UK work visa sponsorship, \
+                or if it's a relatively big and/or international company (which typically can sponsor work visas). \
+                Answer NO if the job explicitly states that sponsorship is not offered or they are only hiring candidates \
+                who are already legally allowed to work in the country. Remember to answer in one word: yes or no."
             messages = [{"role": "user", "content": prompt}]
             answer = generate_response(model, tokenizer, messages)
             print(f'Sponsorship answer: {answer}')
@@ -55,22 +55,14 @@ def filter_jobs():
             print('Checking candidate fit for job:', job['title'])
             prompt = f"Job Title: {job['title']}\nCompany: {job['company']}\nLocation: \
                 {job['location']}\nDescription: {job['description']}\n\nCandidate Summary: \
-                    The candidate is a recent graduate with a Master's degree in Computer Science, \
-                    specializing in Machine Learning. They have experience as a Full Stack Software \
-                    Engineer Intern, working with Python, Django, TypeScript, and React, as well as a \
-                    Frontend Software Engineer Intern, working with React Native, TypeScript, Node, and \
-                    REST APIs. The candidate has also conducted research in Federated Learning, implementing \
-                    machine learning algorithms across GPU clusters, and has worked on projects involving \
-                    Multivariate Time Series Transformers, Autonomous Vehicle Security, Web Application \
-                    Development, Optimization Algorithms, and 3D Object Scanning.\n\nConsidering the job \
-                    description and the candidate's background as a recent graduate with a Master's degree \
-                    in Computer Science, is this role potentially suitable for the candidate? The ideal role \
-                    should not require extensive experience, such as a lead developer position. Answer \
-                    in one word: YES if the role aligns with the candidate's skills and the role \
-                    does not require extensive experience. Answer NO if the role is clearly misaligned \
-                    with the candidate's background or the role requires significant experience that \
-                    the candidate likely does not possess as a recent graduate. Remember to answer \
-                    in one word: yes or no."
+                Recent graduate with a Master's in Computer Science, specializing in Machine Learning. \
+                Has internship experience in Full Stack and Frontend Software Engineering, and research \
+                experience in Federated Learning.\n\nIs this role suitable for someone with a Master's \
+                in Computer Science who is a recent graduate? Answer YES only if the role aligns well \
+                with the candidate's skills and educational background, and does not require extensive \
+                experience. Answer NO if the role is misaligned with the candidate's background or if \
+                it's a staff, senior, or other high-level position that would not be suitable for a \
+                recent graduate. Remember to answer in one word: yes or no."
             messages = [{"role": "user", "content": prompt}]
             answer = generate_response(model, tokenizer, messages)
             print(f'Candidate fit answer: {answer}')
