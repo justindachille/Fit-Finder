@@ -66,15 +66,6 @@ def get_last_run_time():
     else:
         return None
 
-def update_last_run_time(last_published_time):
-    conn = sqlite3.connect('job_listings.db')
-    c = conn.cursor()
-
-    c.execute("INSERT INTO run_history (run_time) VALUES (?)", (last_published_time,))
-
-    conn.commit()
-    conn.close()
-
 def update_job_listing_checked(job_id, field):
     conn = sqlite3.connect('job_listings.db')
     c = conn.cursor()
