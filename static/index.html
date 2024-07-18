@@ -4,14 +4,60 @@
     <title>Job Listings</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
         .container {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
         .section {
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #job-details {
+            margin-bottom: 15px;
+        }
+        .job-title, .job-company {
+            margin-bottom: 5px;
+        }
+        .job-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .job-company {
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        #open-job, #mark-inactive {
+            margin-right: 10px;
         }
     </style>
     <script>
@@ -57,20 +103,21 @@
                 container.empty();
 
                 if (job) {
-                    var jobDetails = $('<div>').text('Title: ' + job.title);
-                    container.append(jobDetails);
+                    var jobTitle = $('<div>').addClass('job-title').text(job.title);
+                    var jobCompany = $('<div>').addClass('job-company').text(job.company);
+                    container.append(jobTitle).append(jobCompany);
 
                     $('#open-job').off('click').on('click', function() {
                         if (job.link) {
                             window.open(job.link, '_blank');
                         }
-                    });
+                    }).prop('disabled', false);
 
                     $('#mark-inactive').off('click').on('click', function() {
                         markJobListingInactive(job.id, function() {
                             displayLatestJobListing(); // Load the next suitable job listing
                         });
-                    });
+                    }).prop('disabled', false);
                 } else {
                     container.text('No suitable job listings available.');
                     $('#open-job').prop('disabled', true);
