@@ -11,8 +11,9 @@ llm_cache/
 
 /proxies/
 /proxies/megaproxylist.csv
-
+/downloaded_files/
 /latest_logs/
+
 # Distribution / packaging
 .Python
 build/
