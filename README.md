@@ -1,8 +1,17 @@
 # Indeed-Scraping
 
-run with ```python app.py```
+### Customization
+* Add custom Indeed links into `base_urls` for jobs in file `scraper.py`
 
-* Authenticate Huggingface-cli with 
-`huggingface-cli login --token [your token]`
+* Customize LLM prompts in `filter_jobs.py`
 
-* LLM will be stored in ./llm_cache/ directory
+### Setup Instructions
+
+* Authenticate Huggingface-cli with `huggingface-cli login --token [your token]`
+
+* Start local app with `python app.py`
+
+* Load `http://127.0.0.1:5000/` in browser
+
+Notes:
+LLM will be stored in ./llm_cache/ directory
