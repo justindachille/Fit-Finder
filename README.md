@@ -1,4 +1,4 @@
-# LLM Recruiting Assistant 
+# Fit Finder - LLM Recruiting Assistant 
 
 A Flask-based web application for efficient job listing management, leveraging the Meta-Llama-3-8B-Instruct model for intelligent filtering and analysis.
 
